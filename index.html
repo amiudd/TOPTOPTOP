@@ -2,72 +2,69 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cubo Musical 3D</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      height: 100vh;
-      width: 100vw;
-      font-family: 'Segoe UI', sans-serif;
+    html, body {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       touch-action: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
       background: url('assets/fondo.jpg') no-repeat center center fixed;
       background-size: cover;
-      position: relative;
     }
 
     .scene {
-      width: 300px;
-      height: 300px;
-      perspective: 1000px;
+      width: 80vmin;
+      height: 80vmin;
+      perspective: 1200px;
+      margin: auto;
       position: relative;
-      z-index: 10;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     .cube {
       width: 100%;
       height: 100%;
-      position: absolute;
       transform-style: preserve-3d;
-      transition: transform 0.1s linear;
+      transition: transform 0.2s linear;
     }
 
     .face {
       position: absolute;
-      width: 300px;
-      height: 300px;
+      width: 100%;
+      height: 100%;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       border: 2px solid red;
-      box-shadow: 0 0 20px red;
+      box-shadow: 0 0 10px red;
       animation: parpadeo 1.2s infinite alternate;
     }
 
-    .front  { transform: translateZ(150px); background-image: url('assets/cara1.jpg'); }
-    .back   { transform: rotateY(180deg) translateZ(150px); background-image: url('assets/cara2.jpg'); }
-    .right  { transform: rotateY(90deg) translateZ(150px); background-image: url('assets/cara3.jpg'); }
-    .left   { transform: rotateY(-90deg) translateZ(150px); background-image: url('assets/cara4.jpg'); }
-    .top    { transform: rotateX(90deg) translateZ(150px); background-image: url('assets/cara5.jpg'); }
-    .bottom { transform: rotateX(-90deg) translateZ(150px); background-image: url('assets/cara6.jpg'); }
+    .front  { transform: translateZ(40vmin); background-image: url('assets/cara1.jpg'); }
+    .back   { transform: rotateY(180deg) translateZ(40vmin); background-image: url('assets/cara2.jpg'); }
+    .right  { transform: rotateY(90deg) translateZ(40vmin); background-image: url('assets/cara3.jpg'); }
+    .left   { transform: rotateY(-90deg) translateZ(40vmin); background-image: url('assets/cara4.jpg'); }
+    .top    { transform: rotateX(90deg) translateZ(40vmin); background-image: url('assets/cara5.jpg'); }
+    .bottom { transform: rotateX(-90deg) translateZ(40vmin); background-image: url('assets/cara6.jpg'); }
 
     @keyframes parpadeo {
-      0%   { border-color: red; box-shadow: 0 0 20px red; }
-      100% { border-color: black; box-shadow: 0 0 20px black; }
+      0%   { border-color: red; box-shadow: 0 0 10px red; }
+      100% { border-color: black; box-shadow: 0 0 10px black; }
     }
 
     .rain-symbol {
       position: absolute;
       top: -50px;
-      font-size: 24px;
+      font-size: 5vmin;
       color: #fff;
       opacity: 0.6;
       animation: fall 6s linear forwards;
-      z-index: 1;
       pointer-events: none;
     }
 
@@ -79,11 +76,7 @@
     }
 
     #audioPlayer {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
+      display: none;
     }
   </style>
 </head>
@@ -100,7 +93,7 @@
     </div>
   </div>
 
-  <audio id="audioPlayer" controls></audio>
+  <audio id="audioPlayer" preload="auto" controls></audio>
 
   <script>
     const cube = document.getElementById("cube");
@@ -134,10 +127,8 @@
 
     function drag(x, y) {
       if (!isDragging) return;
-      const deltaX = x - startX;
-      const deltaY = y - startY;
-      rotateY += deltaX * 0.5;
-      rotateX -= deltaY * 0.5;
+      rotateY += (x - startX) * 0.5;
+      rotateX -= (y - startY) * 0.5;
       startX = x;
       startY = y;
       updateRotation();
@@ -159,14 +150,13 @@
       el.className = "rain-symbol";
       el.innerText = symbols[Math.floor(Math.random() * symbols.length)];
       el.style.left = Math.random() * 100 + "vw";
-      el.style.fontSize = (20 + Math.random() * 15) + "px";
       el.style.animationDuration = (5 + Math.random() * 3) + "s";
       document.body.appendChild(el);
-      setTimeout(() => document.body.removeChild(el), 8000);
+      setTimeout(() => el.remove(), 8000);
     }
 
     function iniciarLluvia() {
-      if (lluviaInterval) clearInterval(lluviaInterval);
+      clearInterval(lluviaInterval);
       lluviaInterval = setInterval(crearSimbolo, 300);
     }
 
@@ -175,7 +165,6 @@
     }
 
     function reproducirCancionDesdeInicio(index) {
-      if (index >= canciones.length) index = 0;
       currentSongIndex = index;
       audio.src = canciones[index];
       audio.currentTime = 0;
@@ -185,9 +174,11 @@
 
     audio.addEventListener("ended", () => {
       detenerLluvia();
-      reproducirCancionDesdeInicio((currentSongIndex + 1) % canciones.length);
+      const siguiente = (currentSongIndex + 1) % canciones.length;
+      reproducirCancionDesdeInicio(siguiente);
     });
 
+    // Tap logic
     faces.forEach(face => {
       let tapCount = 0;
       let tapTimer = null;
@@ -195,13 +186,13 @@
 
       const handleTap = () => {
         tapCount++;
-        if (tapTimer) clearTimeout(tapTimer);
+        clearTimeout(tapTimer);
 
         tapTimer = setTimeout(() => {
-          const isSameSong = audio.src.includes(canciones[index]);
+          const mismaCancion = audio.src.includes(canciones[index]);
 
           if (tapCount === 1) {
-            if (!isSameSong) {
+            if (!mismaCancion) {
               reproducirCancionDesdeInicio(index);
             } else {
               if (audio.paused) {
@@ -212,7 +203,7 @@
                 detenerLluvia();
               }
             }
-          } else if (tapCount === 2 && isSameSong) {
+          } else if (tapCount === 2 && mismaCancion) {
             reproducirCancionDesdeInicio(index);
           }
 
@@ -226,4 +217,3 @@
   </script>
 </body>
 </html>
-
