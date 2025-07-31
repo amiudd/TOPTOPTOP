@@ -2,28 +2,37 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Cubo Musical 3D</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
 
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: sans-serif;
-      background: url('assets/fondo.jpg') no-repeat center center fixed;
+      touch-action: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000 url('assets/fondo.jpg') no-repeat center center;
       background-size: cover;
     }
 
     .scene {
-      width: 80vmin;
-      height: 80vmin;
-      perspective: 2000px;
-      margin: auto;
-      position: relative;
+      position: absolute;
+      perspective: 1000px;
+      width: 85vmin;
+      height: 85vmin;
       top: 50%;
-      transform: translateY(-50%);
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 2;
     }
 
@@ -31,8 +40,9 @@
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
-      transition: transform 0.2s linear;
-      transform: scale(0.6) rotateX(-30deg) rotateY(30deg);
+      transition: transform 0.1s linear;
+      transform: scale(0.65) rotateX(-15deg) rotateY(15deg);
+      will-change: transform;
     }
 
     .face {
@@ -42,30 +52,57 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      border: 1px solid red;
+      border: 3px solid;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.8),
+                  0 0 30px rgba(255, 0, 0, 0.6),
+                  0 0 45px rgba(255, 0, 0, 0.4);
+      animation: borderPulse 1.2s infinite alternate;
+      backface-visibility: visible;
     }
 
-    .front  { transform: translateZ(40vmin); background-image: url('assets/cara1.jpg'); }
-    .back   { transform: rotateY(180deg) translateZ(40vmin); background-image: url('assets/cara2.jpg'); }
-    .right  { transform: rotateY(90deg) translateZ(40vmin); background-image: url('assets/cara3.jpg'); }
-    .left   { transform: rotateY(-90deg) translateZ(40vmin); background-image: url('assets/cara4.jpg'); }
-    .top    { transform: rotateX(90deg) translateZ(40vmin); background-image: url('assets/cara5.jpg'); }
-    .bottom { transform: rotateX(-90deg) translateZ(40vmin); background-image: url('assets/cara6.jpg'); }
+    @keyframes borderPulse {
+      0% {
+        border-color: rgba(255, 0, 0, 0.9);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9),
+                    0 0 40px rgba(255, 0, 0, 0.7),
+                    0 0 60px rgba(255, 0, 0, 0.5);
+      }
+      50% {
+        border-color: rgba(180, 0, 0, 0.8);
+        box-shadow: 0 0 15px rgba(180, 0, 0, 0.8),
+                    0 0 30px rgba(180, 0, 0, 0.6),
+                    0 0 45px rgba(180, 0, 0, 0.4);
+      }
+      100% {
+        border-color: rgba(0, 0, 0, 0.9);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.9),
+                    0 0 20px rgba(0, 0, 0, 0.7),
+                    0 0 30px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    .front  { transform: translateZ(42.5vmin); }
+    .back   { transform: rotateY(180deg) translateZ(42.5vmin); }
+    .right  { transform: rotateY(90deg) translateZ(42.5vmin); }
+    .left   { transform: rotateY(-90deg) translateZ(42.5vmin); }
+    .top    { transform: rotateX(90deg) translateZ(42.5vmin); }
+    .bottom { transform: rotateX(-90deg) translateZ(42.5vmin); }
 
     .rain-symbol {
       position: absolute;
       top: -50px;
-      font-size: 4vmin;
-      color: #fff;
-      opacity: 0.4;
-      z-index: 0; /* Detrás del cubo */
-      animation: fall 6s linear forwards;
+      font-size: 4.5vmin;
+      color: rgba(255, 255, 255, 0.7);
+      text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+      z-index: 1;
+      animation: fall linear forwards;
       pointer-events: none;
+      will-change: transform;
     }
 
     @keyframes fall {
       to {
-        transform: translateY(110vh);
+        transform: translateY(120vh);
         opacity: 0;
       }
     }
@@ -75,11 +112,28 @@
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 90%;
-      max-width: 400px;
-      z-index: 3;
-      background-color: rgba(0, 0, 0, 0.4);
-      border-radius: 10px;
+      width: 95%;
+      max-width: 320px;
+      z-index: 10;
+      background-color: rgba(20, 20, 20, 0.8);
+      border-radius: 12px;
+      padding: 8px;
+      border: 1px solid rgba(255, 0, 0, 0.5);
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    }
+
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-height: 600px) {
+      .scene {
+        width: 75vmin;
+        height: 75vmin;
+      }
+      
+      #audioPlayer {
+        bottom: 5px;
+        padding: 6px;
+        max-width: 280px;
+      }
     }
   </style>
 </head>
@@ -87,21 +141,23 @@
 
   <div class="scene">
     <div class="cube" id="cube">
-      <div class="face front"  data-index="0"></div>
-      <div class="face back"   data-index="1"></div>
-      <div class="face right"  data-index="2"></div>
-      <div class="face left"   data-index="3"></div>
-      <div class="face top"    data-index="4"></div>
-      <div class="face bottom" data-index="5"></div>
+      <div class="face front"  data-index="0" style="background-image: url('assets/cara1.jpg')"></div>
+      <div class="face back"   data-index="1" style="background-image: url('assets/cara2.jpg')"></div>
+      <div class="face right"  data-index="2" style="background-image: url('assets/cara3.jpg')"></div>
+      <div class="face left"   data-index="3" style="background-image: url('assets/cara4.jpg')"></div>
+      <div class="face top"    data-index="4" style="background-image: url('assets/cara5.jpg')"></div>
+      <div class="face bottom" data-index="5" style="background-image: url('assets/cara6.jpg')"></div>
     </div>
   </div>
 
-  <audio id="audioPlayer" controls preload="auto"></audio>
+  <audio id="audioPlayer" controls preload="auto" x-webkit-airplay="allow"></audio>
 
   <script>
-    const cube = document.getElementById("cube");
-    const audio = document.getElementById("audioPlayer");
-    const faces = document.querySelectorAll(".face");
+    // Detección de móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const cube = document.getElementById('cube');
+    const audio = document.getElementById('audioPlayer');
+    const faces = document.querySelectorAll('.face');
     const symbols = ["|-/", "ψ", "tΦp", "Ø"];
     const canciones = [
       "assets/cancion1.mp3",
@@ -112,109 +168,181 @@
       "assets/cancion6.mp3"
     ];
 
-    let rotateX = -30;
-    let rotateY = 30;
+    // Configuración inicial
+    let rotateX = -15;
+    let rotateY = 15;
     let startX, startY, isDragging = false;
     let lluviaInterval = null;
     let currentSongIndex = -1;
+    let lastTapTime = 0;
+    let tapCount = 0;
 
     function updateRotation() {
-      cube.style.transform = `scale(0.6) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      cube.style.transform = `scale(0.65) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     }
 
-    function startDrag(x, y) {
+    // Control táctil para móviles
+    function handleStart(x, y) {
       isDragging = true;
       startX = x;
       startY = y;
+      cube.style.transition = 'none';
     }
 
-    function drag(x, y) {
+    function handleMove(x, y) {
       if (!isDragging) return;
-      rotateY += (x - startX) * 0.5;
-      rotateX -= (y - startY) * 0.5;
+      
+      const sensitivity = 0.6;
+      rotateY += (x - startX) * sensitivity;
+      rotateX -= (y - startY) * sensitivity;
+      
+      // Limitar la rotación vertical
+      rotateX = Math.max(-50, Math.min(50, rotateX));
+      
       startX = x;
       startY = y;
       updateRotation();
     }
 
-    function endDrag() {
+    function handleEnd() {
       isDragging = false;
+      cube.style.transition = 'transform 0.2s linear';
     }
 
-    document.addEventListener("mousedown", e => startDrag(e.clientX, e.clientY));
-    document.addEventListener("mousemove", e => drag(e.clientX, e.clientY));
-    document.addEventListener("mouseup", endDrag);
-    document.addEventListener("touchstart", e => startDrag(e.touches[0].clientX, e.touches[0].clientY));
-    document.addEventListener("touchmove", e => drag(e.touches[0].clientX, e.touches[0].clientY));
-    document.addEventListener("touchend", endDrag);
+    // Eventos táctiles
+    document.addEventListener('touchstart', e => {
+      e.preventDefault();
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    
+    document.addEventListener('touchmove', e => {
+      e.preventDefault();
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+    
+    document.addEventListener('touchend', e => {
+      e.preventDefault();
+      handleEnd();
+    });
 
+    // También soporte para ratón (por si acaso)
+    document.addEventListener('mousedown', e => {
+      e.preventDefault();
+      handleStart(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mousemove', e => {
+      e.preventDefault();
+      handleMove(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mouseup', e => {
+      e.preventDefault();
+      handleEnd();
+    });
+
+    // Efecto de lluvia optimizado para móviles
     function crearSimbolo() {
-      const el = document.createElement("div");
-      el.className = "rain-symbol";
+      const el = document.createElement('div');
+      el.className = 'rain-symbol';
       el.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-      el.style.left = Math.random() * 100 + "vw";
-      el.style.animationDuration = (4 + Math.random() * 3) + "s";
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (3 + Math.random() * 4) + 's';
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 8000);
+      
+      // Limpieza de elementos
+      setTimeout(() => {
+        if (el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      }, 7000);
     }
 
     function iniciarLluvia() {
       clearInterval(lluviaInterval);
-      lluviaInterval = setInterval(crearSimbolo, 300);
+      lluviaInterval = setInterval(crearSimbolo, 400);
     }
 
     function detenerLluvia() {
       clearInterval(lluviaInterval);
+      lluviaInterval = null;
     }
 
-    function reproducirCancionDesdeInicio(index) {
+    // Control de música
+    function reproducirCancion(index) {
+      if (currentSongIndex === index && !audio.paused) {
+        audio.pause();
+        detenerLluvia();
+        return;
+      }
+      
       currentSongIndex = index;
       audio.src = canciones[index];
       audio.currentTime = 0;
-      audio.play();
-      iniciarLluvia();
+      
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          // Mostrar instrucción para el usuario en iOS
+          if (isMobile) {
+            alert('Toca la pantalla para iniciar la música');
+          }
+        }).then(() => {
+          iniciarLluvia();
+        });
+      } else {
+        iniciarLluvia();
+      }
     }
 
-    audio.addEventListener("ended", () => {
+    audio.addEventListener('ended', () => {
       detenerLluvia();
       const siguiente = (currentSongIndex + 1) % canciones.length;
-      reproducirCancionDesdeInicio(siguiente);
+      setTimeout(() => reproducirCancion(siguiente), 500);
     });
 
-    faces.forEach(face => {
-      let tapCount = 0;
-      let tapTimer = null;
-      const index = parseInt(face.getAttribute("data-index"));
+    // Control táctil para caras del cubo
+    faces.forEach((face, index) => {
+      face.addEventListener('click', () => handleFaceTap(index));
+      face.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleFaceTap(index);
+      });
+    });
 
-      const handleTap = () => {
+    function handleFaceTap(index) {
+      const now = Date.now();
+      const doubleTapDelay = 300;
+      
+      if (now - lastTapTime < doubleTapDelay) {
+        // Doble tap
+        reproducirCancion(index);
+        tapCount = 0;
+      } else {
+        // Tap simple
         tapCount++;
-        clearTimeout(tapTimer);
-
-        tapTimer = setTimeout(() => {
-          const mismaCancion = audio.src.includes(canciones[index]);
-
-          if (tapCount === 1) {
-            if (!mismaCancion) {
-              reproducirCancionDesdeInicio(index);
-            } else {
-              if (audio.paused) {
-                audio.play();
-                iniciarLluvia();
-              } else {
-                audio.pause();
-                detenerLluvia();
-              }
+        if (tapCount === 1) {
+          setTimeout(() => {
+            if (tapCount === 1) {
+              reproducirCancion(index);
             }
-          } else if (tapCount === 2 && mismaCancion) {
-            reproducirCancionDesdeInicio(index);
-          }
+            tapCount = 0;
+          }, doubleTapDelay);
+        }
+      }
+      
+      lastTapTime = now;
+    }
 
-          tapCount = 0;
-        }, 400);
-      };
+    // Solución para autoplay en iOS
+    document.body.addEventListener('touchstart', function initAudio() {
+      document.body.removeEventListener('touchstart', initAudio);
+    }, { once: true });
 
-      face.addEventListener("click", handleTap);
-      face.addEventListener("touchend", handleTap);
+    // Ajustar al cambiar tamaño (rotación en tablets)
+    window.addEventListener('resize', () => {
+      updateRotation();
     });
   </script>
 </body>
