@@ -176,6 +176,7 @@
     let currentSongIndex = -1;
     let lastTapTime = 0;
     let tapCount = 0;
+    let isPaused = false;
 
     function updateRotation() {
       cube.style.transform = `scale(0.65) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
@@ -192,7 +193,7 @@
     function handleMove(x, y) {
       if (!isDragging) return;
       
-      const sensitivity = 0.8; // Sensibilidad aumentada
+      const sensitivity = 0.8;
       rotateY += (x - startX) * sensitivity;
       rotateX -= (y - startY) * sensitivity;
       
@@ -265,31 +266,54 @@
       lluviaInterval = null;
     }
 
-    // Control de música
+    // Control de música mejorado
     function reproducirCancion(index) {
-      if (currentSongIndex === index && !audio.paused) {
-        audio.pause();
-        detenerLluvia();
-        return;
-      }
-      
-      currentSongIndex = index;
-      audio.src = canciones[index];
-      audio.currentTime = 0;
-      
-      const playPromise = audio.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          // Mostrar instrucción para el usuario en iOS
-          if (isMobile) {
-            alert('Toca la pantalla para iniciar la música');
-          }
-        }).then(() => {
+      if (currentSongIndex !== index) {
+        // Nueva canción seleccionada
+        currentSongIndex = index;
+        audio.src = canciones[index];
+        audio.currentTime = 0;
+        isPaused = false;
+        
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            if (isMobile) {
+              alert('Toca la pantalla para iniciar la música');
+            }
+          }).then(() => {
+            iniciarLluvia();
+          });
+        } else {
           iniciarLluvia();
-        });
+        }
       } else {
-        iniciarLluvia();
+        // Misma canción, manejar play/pause
+        if (audio.paused) {
+          audio.play();
+          isPaused = false;
+          iniciarLluvia();
+        } else {
+          audio.pause();
+          isPaused = true;
+          detenerLluvia();
+        }
+      }
+    }
+
+    function reanudarCancion() {
+      if (currentSongIndex !== -1) {
+        if (isPaused || audio.paused) {
+          audio.play();
+          isPaused = false;
+          iniciarLluvia();
+        } else {
+          // Si ya está sonando, reiniciar
+          audio.currentTime = 0;
+          audio.play();
+          iniciarLluvia();
+        }
       }
     }
 
@@ -313,11 +337,11 @@
       const doubleTapDelay = 300;
       
       if (now - lastTapTime < doubleTapDelay) {
-        // Doble tap
-        reproducirCancion(index);
+        // Doble tap - reanudar
         tapCount = 0;
+        reanudarCancion();
       } else {
-        // Tap simple
+        // Tap simple - play/pause
         tapCount++;
         if (tapCount === 1) {
           setTimeout(() => {
