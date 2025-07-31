@@ -192,12 +192,9 @@
     function handleMove(x, y) {
       if (!isDragging) return;
       
-      const sensitivity = 0.6;
+      const sensitivity = 0.8; // Sensibilidad aumentada
       rotateY += (x - startX) * sensitivity;
       rotateX -= (y - startY) * sensitivity;
-      
-      // Limitar la rotación vertical
-      rotateX = Math.max(-50, Math.min(50, rotateX));
       
       startX = x;
       startY = y;
@@ -206,7 +203,7 @@
 
     function handleEnd() {
       isDragging = false;
-      cube.style.transition = 'transform 0.2s linear';
+      cube.style.transition = 'transform 0.1s linear';
     }
 
     // Eventos táctiles
@@ -225,7 +222,7 @@
       handleEnd();
     });
 
-    // También soporte para ratón (por si acaso)
+    // También soporte para ratón
     document.addEventListener('mousedown', e => {
       e.preventDefault();
       handleStart(e.clientX, e.clientY);
