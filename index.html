@@ -279,9 +279,7 @@
         
         if (playPromise !== undefined) {
           playPromise.catch(error => {
-            if (isMobile) {
-              alert('Toca la pantalla para iniciar la música');
-            }
+            // Se eliminó el alert que mostraba el mensaje
           }).then(() => {
             iniciarLluvia();
           });
